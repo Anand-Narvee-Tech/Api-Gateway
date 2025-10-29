@@ -72,7 +72,7 @@ import com.example.authorization.PrivilegeAuthorizationManager;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-<<<<<<< HEAD
+
 	
 //	 @Bean
 //	    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -99,13 +99,13 @@ public class SecurityConfig {
            .anyExchange().authenticated());
  return http.build();
 }
-=======
+
     @Autowired
     private TJwtAuthFeignFilter jwtFilter;
     
     @Autowired
     private PrivilegeAuthorizationManager privilegeAuthorizationManager;
->>>>>>> Japhanya
+
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
