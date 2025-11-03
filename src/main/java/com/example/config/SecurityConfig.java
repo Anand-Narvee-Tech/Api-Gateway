@@ -60,12 +60,13 @@ import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import com.example.authorization.PrivilegeAuthorizationManager;
+
+
 
 
 @Configuration
@@ -88,17 +89,17 @@ public class SecurityConfig {
 //	    }
 //	
 	
-	@Bean
-  public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-     http
-   .csrf(ServerHttpSecurity.CsrfSpec::disable)
-           .cors(cors -> {})  // just enable, do not configure here
-           .authorizeExchange(exchanges -> exchanges
-           .pathMatchers(HttpMethod.OPTIONS).permitAll()
-           .pathMatchers("/auth/**", "/customer/**","/vendor/**", "/invoice/**", "/manual-invoice/**" , "/bills/**").permitAll()
-           .anyExchange().authenticated());
- return http.build();
-}
+//	@Bean
+//  public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+//     http
+//   .csrf(ServerHttpSecurity.CsrfSpec::disable)
+//           .cors(cors -> {})  // just enable, do not configure here
+//           .authorizeExchange(exchanges -> exchanges
+//           .pathMatchers(HttpMethod.OPTIONS).permitAll()
+//           .pathMatchers("/auth/**", "/customer/**","/vendor/**", "/invoice/**", "/manual-invoice/**" , "/bills/**").permitAll()
+//           .anyExchange().authenticated());
+// return http.build();
+//}
 
     @Autowired
     private TJwtAuthFeignFilter jwtFilter;
@@ -119,10 +120,10 @@ public class SecurityConfig {
                         // Allow preflight requests
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         // Public endpoints (login, register, OTP, token check)
-                        .pathMatchers("/auth/login", "/auth/register",
-                                      "/auth/login/send-otp", "/auth/check-token",
-                                      "/auth/validate-token","/auth/roles/**", 
-                                      "/auth/privileges/**","/bills/**","/vendor/**",  "/customer/**", "/manual-invoice/**", "/invoice/**").permitAll()
+                        .pathMatchers("/auth/login/**", "/auth/register",
+                                      "/auth/login/send-otp/**", "/auth/check-token",
+                                      "/auth/validate-token","/auth/roles/**",  "/auth/updated/save",
+                                      "/auth/privileges/**","/bills/**","/vendor/**",  "/customer/**", "/manual-invoice/**", "/invoice/**","/auth/privileges/category/**").permitAll()
                         // All other endpoints → dynamic privilege check
                         .anyExchange().access(privilegeAuthorizationManager)
                 )
@@ -135,7 +136,7 @@ public class SecurityConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://10.10.0.200:4200"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://10.10.0.200","76.234.146.243"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
@@ -146,3 +147,4 @@ public class SecurityConfig {
         return new CorsWebFilter(source);
     }
 }
+
