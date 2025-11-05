@@ -54,7 +54,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -108,43 +110,104 @@ public class SecurityConfig {
     private PrivilegeAuthorizationManager privilegeAuthorizationManager;
 
 
+//    @Bean
+//    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+//        return http
+//                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+//                .cors(cors -> {})
+//                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+//                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+//                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+//                .authorizeExchange(exchanges -> exchanges
+//                        // Allow preflight requests
+//                        .pathMatchers(HttpMethod.OPTIONS).permitAll()
+//                        // Public endpoints (login, register, OTP, token check)
+//                        .pathMatchers("/auth/login/**", "/auth/register",
+//                                      "/auth/login/send-otp/**", "/auth/check-token",
+//                                      "/auth/validate-token","/auth/roles/**",  "/auth/updated/save",
+//                                      "/auth/privileges/**","/bills/**","/vendor/**",  "/customer/**", "/manual-invoice/**", "/invoice/**","/auth/privileges/category/**").permitAll()
+//                        // All other endpoints → dynamic privilege check
+//                        .anyExchange().access(privilegeAuthorizationManager)
+//                )
+//                // JWT filter → extract roles & privileges
+//                .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+//                .build();
+//    }
+    
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(cors -> {})
+                .cors(Customizer.withDefaults())  //  enable CORS here
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
-                        // Allow preflight requests
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                        // Public endpoints (login, register, OTP, token check)
-                        .pathMatchers("/auth/login/**", "/auth/register",
-                                      "/auth/login/send-otp/**", "/auth/check-token",
-                                      "/auth/validate-token","/auth/roles/**",  "/auth/updated/save",
-                                      "/auth/privileges/**","/bills/**","/vendor/**",  "/customer/**", "/manual-invoice/**", "/invoice/**","/auth/privileges/category/**").permitAll()
-                        // All other endpoints → dynamic privilege check
+                        .pathMatchers("/auth/login", "/auth/register",
+                                      "/auth/login/send-otp", "/auth/check-token", "/auth/updated/save",
+                                      "/auth/validate-token", "/auth/roles/**", "/auth/privileges/category/**" ,
+                                      "/auth/privileges/**", "/bills/**",  "/auth/manageusers/**", 
+                                      "/vendor/**", "/customer/**", "/manual-invoice/**",
+                                      "/invoice/**")
+                            .permitAll()
                         .anyExchange().access(privilegeAuthorizationManager)
                 )
-                // JWT filter → extract roles & privileges
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
 
+    
+//    @Bean
+//    public CorsWebFilter corsWebFilter() {
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowCredentials(true);
+//
+//        //  Use allowedOriginPatterns instead of allowedOrigins
+//        config.setAllowedOriginPatterns(List.of(
+//                "http://localhost:*",
+//                "http://10.10.0.200:*" ,
+//                "http://76.234.146.243:*"
+//        ));
+//       
+//        config.addAllowedHeader("*");
+//        config.addAllowedMethod("*");
+//        config.addExposedHeader("Authorization");
+//        config.addExposedHeader("Content-Disposition");
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config);
+//
+//        return new CorsWebFilter(source);
+//    }
+
+
+
     @Bean
+    @Order(0)
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://10.10.0.200","76.234.146.243"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
-        config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+
+        // Allow localhost and your LAN IP (both http/https, any port)
+        config.setAllowedOriginPatterns(List.of(
+            "http://localhost:*",
+            "http://10.10.0.200",
+            "https://10.10.0.200",
+            "http://76.234.146.243:*"
+        ));
+
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.addExposedHeader("Authorization");
+        config.addExposedHeader("Content-Disposition");
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return new CorsWebFilter(source);
     }
+
+
 }
 
