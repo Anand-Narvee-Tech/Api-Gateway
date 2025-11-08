@@ -45,11 +45,15 @@ public class PrivilegeAuthorizationManager implements ReactiveAuthorizationManag
         String path = context.getExchange().getRequest().getPath().toString();
         String requiredPrivilege = getRequiredPrivilege(path);
 
-        if (requiredPrivilege == null) {
-            // No privilege required → allow
+//        if (requiredPrivilege == null) {
+//            // No privilege required → allow
+//            return Mono.just(new AuthorizationDecision(true));
+//        }
+        
+        if (path.startsWith("/auth/") || path.startsWith("/vendor/") || path.startsWith("/customer/")) {
             return Mono.just(new AuthorizationDecision(true));
         }
-
+         
         return authentication.map(auth -> {
             boolean granted = auth.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equalsIgnoreCase(requiredPrivilege)
