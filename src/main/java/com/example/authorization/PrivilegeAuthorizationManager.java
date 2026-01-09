@@ -29,12 +29,12 @@ public class PrivilegeAuthorizationManager implements ReactiveAuthorizationManag
         refreshPrivilegeMap(); // Load initially
     }
 
-    // Optional: refresh every 5 minutes (so new privileges are picked up automatically)
+    // Refresh privilege map every 5 minutes
     @Scheduled(fixedDelay = 300000)
     public void refreshPrivilegeMap() {
         try {
             endpointPrivileges = loginServiceFeign.getEndpointPrivilegeMap();
-            log.info(" Loaded {} endpoint privilege mappings", endpointPrivileges.size());
+            log.info("Loaded {} endpoint privilege mappings", endpointPrivileges.size());
         } catch (Exception e) {
             log.error("⚠️ Failed to refresh privilege mappings: {}", e.getMessage());
         }
@@ -45,26 +45,24 @@ public class PrivilegeAuthorizationManager implements ReactiveAuthorizationManag
         String path = context.getExchange().getRequest().getPath().toString();
         String requiredPrivilege = getRequiredPrivilege(path);
 
-//        if (requiredPrivilege == null) {
-//            // No privilege required → allow
-//            return Mono.just(new AuthorizationDecision(true));
-//        }
-        
-        if (path.startsWith("/auth/") || path.startsWith("/vendor/") || path.startsWith("/customer/")) {
-            return Mono.just(new AuthorizationDecision(true));
+        // If no privilege mapping exists for this endpoint, deny access
+        if (requiredPrivilege == null) {
+            log.warn("No privilege mapping found for path '{}'. Denying access.", path);
+            return Mono.just(new AuthorizationDecision(false));
         }
-         
+
         return authentication.map(auth -> {
             boolean granted = auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equalsIgnoreCase(requiredPrivilege)
-                            || a.getAuthority().equalsIgnoreCase("ROLE_SUPERADMIN")); // Superadmin bypass
+                    .map(a -> a.getAuthority())
+                    .anyMatch(a -> a.equalsIgnoreCase(requiredPrivilege)); // Only match selected privilege
 
-            log.info(" [{}] requires '{}', granted={}", path, requiredPrivilege, granted);
+            log.info("[{}] requires '{}', granted={}", path, requiredPrivilege, granted);
             return new AuthorizationDecision(granted);
-        }).defaultIfEmpty(new AuthorizationDecision(false));
+        }).defaultIfEmpty(new AuthorizationDecision(false)); // No authentication → deny
     }
 
     private String getRequiredPrivilege(String path) {
+        // Find first endpoint that matches the request path
         return endpointPrivileges.entrySet().stream()
                 .filter(entry -> path.startsWith(entry.getKey()))
                 .map(Map.Entry::getValue)

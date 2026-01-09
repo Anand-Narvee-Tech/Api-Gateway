@@ -31,23 +31,17 @@ public class SecurityConfig {
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                        .pathMatchers(
-                                "/auth/login",
-                                "/auth/register",
-                                "/auth/login/send-otp",
-                                "/auth/check-token",
-                                "/auth/validate-token",
-                                "/auth/roles/**",
-                                "/auth/privileges/**", 
-                                "/bills/**",
-                                "/vendor/**",
-                                "/customer/**",
-                                "/manual-invoice/**",
-                                "/invoice/**"
-                        ).permitAll()
-                        .anyExchange().access(privilegeAuthorizationManager)
-                )
+                	    .pathMatchers(HttpMethod.OPTIONS).permitAll()
+                	    .pathMatchers(
+                	        "/auth/**", "/auth/updated/save",
+                	        "/bills/**",
+                	        "/vendor/**", 
+                	        "/customer/**",
+                	        "/manual-invoice/**",
+                	        "/invoice/**"
+                	    ).permitAll()
+                	    .anyExchange().access(privilegeAuthorizationManager)
+                	)
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
