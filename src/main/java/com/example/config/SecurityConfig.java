@@ -33,10 +33,11 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                 	    .pathMatchers(HttpMethod.OPTIONS).permitAll()
                 	    .pathMatchers(
-                	        "/auth/**", "/auth/updated/save",
+                	        "/auth/**", "/auth/updated/save", "/auth/manageusers/searchAndsorting",
                 	        "/bills/**",
                 	        "/vendor/**", 
                 	        "/customer/**",
+                	        "/dashboard/**",
                 	        "/manual-invoice/**",
                 	        "/invoice/**"
                 	    ).permitAll()

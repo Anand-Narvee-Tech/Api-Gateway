@@ -42,6 +42,7 @@ public class TJwtAuthFeignFilter implements WebFilter {
         if (path.startsWith("/auth/login")
             || path.startsWith("/auth/register")
             || path.startsWith("/auth/login/send-otp")
+            || path.startsWith("/auth/manageusers/searchAndsorting")
             || path.startsWith("/auth/check-token")
             || path.startsWith("/auth/validate-token")
             || path.startsWith("/auth/roles/")
@@ -55,7 +56,7 @@ public class TJwtAuthFeignFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
-        // ✅ Validate Authorization header
+        //  Validate Authorization header
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -85,7 +86,7 @@ public class TJwtAuthFeignFilter implements WebFilter {
             if (privileges != null)
                 privileges.forEach(p -> authorities.add(new SimpleGrantedAuthority(p.toUpperCase())));
 
-            log.info("✅ Authenticated user: {} with authorities: {}", username, authorities);
+            log.info(" Authenticated user: {} with authorities: {}", username, authorities);
 
             return new UsernamePasswordAuthenticationToken(username, null, authorities);
         })
