@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "INVOICE-LOGIN-SERVICE", url = "${login.service.url}")
+@FeignClient(name = "INVOICE-LOGIN-SERVICE")
 public interface LoginServiceFeign {
 
     @PostMapping("/auth/validate-token")

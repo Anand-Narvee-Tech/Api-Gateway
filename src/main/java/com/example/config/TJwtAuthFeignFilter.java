@@ -1,5 +1,6 @@
 package com.example.config;
 
+
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class TJwtAuthFeignFilter implements WebFilter {
             || path.startsWith("/manual-invoice/")
             || path.startsWith("/invoice/")
             || path.startsWith("/bills/")
+            || path.startsWith("/dashboard/")
             || exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
             return chain.filter(exchange);
         }
