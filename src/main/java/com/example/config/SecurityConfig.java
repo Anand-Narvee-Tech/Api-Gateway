@@ -22,25 +22,18 @@ public class SecurityConfig {
     @Autowired
     private PrivilegeAuthorizationManager privilegeAuthorizationManager;
 
-    @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                // ❌ DO NOT enable CORS here, Gateway handles it globally
-                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-                .authorizeExchange(exchanges -> exchanges
-                	    .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                	    .pathMatchers(
-                	        "/auth/**", "/auth/updated/save", "/auth/manageusers/searchAndsorting",
-                	        "/bills/**",
-                	        "/vendor/**", 
-                	        "/customer/**",
-                	        "/dashboard/**",
-                	        "/manual-invoice/**",
-                	        "/invoice/**"
-                	    ).permitAll()
+	@Bean
+	public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+		return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+				// ❌ DO NOT enable CORS here, Gateway handles it globally
+				.formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+				.httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+				.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+				.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.OPTIONS).permitAll()
+						.pathMatchers("/auth/**", "/auth/updated/save", "/auth/manageusers/searchAndsorting",
+								"/bills/**", "/vendor/**", "/customer/**", "/con**", "/dashboard/**",
+								"/manual-invoice/**", "/invoice/**")
+						.permitAll()
 //                	    .anyExchange().access(privilegeAuthorizationManager)
                 	    .anyExchange().permitAll()
                 	)
