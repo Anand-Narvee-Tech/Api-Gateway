@@ -35,9 +35,7 @@ public class SecurityConfig {
 								"/manual-invoice/**", "/invoice/**")
 						.permitAll()
 //                	    .anyExchange().access(privilegeAuthorizationManager)
-                	    .anyExchange().permitAll()
-                	)
-             .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
-                .build();
-    }
+						.anyExchange().permitAll())
+				.addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION).build();
+	}
 }
