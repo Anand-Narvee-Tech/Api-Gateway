@@ -31,8 +31,8 @@ public class SecurityConfig {
 				.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
 				.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.OPTIONS).permitAll()
 						.pathMatchers("/auth/**", "/auth/updated/save", "/auth/manageusers/searchAndsorting",
-								"/bills/**", "/vendor/**", "/customer/**", "/con**", "/dashboard/**",
-								"/manual-invoice/**", "/invoice/**")
+								"/bills/**", "/vendor/**", "/customer/**","/con/**","/auth/login/send-otp", "/dashboard/**",
+							"/manual-invoice/**", "/invoice/**","/auth/updated/save/**","/auth/register/**")
 						.permitAll()
 //                	    .anyExchange().access(privilegeAuthorizationManager)
 						.anyExchange().permitAll())
